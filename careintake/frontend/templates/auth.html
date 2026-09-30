@@ -1,0 +1,14 @@
+{% extends 'base.html' %}{% block body %}
+<div class="authwrap">{% include '_authart.html' %}<div class="card auth"><h2>{{ 'Admin sign in' if portal == 'admin' else 'Welcome back' }}</h2>
+{% if portal == 'admin' %}<p class="muted">For doctors and hospital staff. Your account decides which portal opens.</p>
+{% else %}<div class="tabs"><a class="on" href="{{ url_for('home') }}">Sign in</a><a href="{{ url_for('register') }}">Create account</a></div>{% endif %}
+<form method="post"><input type="hidden" name="csrf" value="{{ csrf }}">
+<label for="email">Email</label><input id="email" name="email" type="email" required autocomplete="username">
+<label for="password">Password</label><div class="pw"><input id="password" name="password" type="password" required autocomplete="current-password"><button type="button" class="eye" data-eye="password" aria-label="Show password"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div><br>
+<button class="full">Sign in</button></form>
+{% if demo %}<p class="muted center">Demo account: <strong>{{ demo }}</strong> / <strong>{{ demo_pw }}</strong></p>{% endif %}
+<p class="muted center"><a href="{{ url_for('reset', portal=portal) }}">Set or reset password</a> | {% if portal == 'admin' %}<a href="{{ url_for('home') }}">Patient sign in</a>{% else %}<a href="{{ url_for('admin_login') }}">Doctor or hospital admin login</a>{% endif %}</p>
+</div></div>
+{% if demo_docs %}<div class="card demodocs"><h3>Demo doctors</h3><p class="muted">Click a doctor to fill the login. Password for all: <strong>{{ demo_pw }}</strong>. After a patient books a doctor, log in as that doctor to see the patient and time.</p>
+{% for hn, grp in demo_docs|groupby('hname') %}<div class="k2">{{ hn }}</div><div class="dbtns">{% for d in grp %}<button type="button" class="gray sm" data-fill="{{ d.email }}" data-pw="{{ demo_pw }}">{{ d.name }} <span class="muted">{{ d.dept }}</span></button>{% endfor %}</div>{% endfor %}</div>{% endif %}
+{% if hospitals %}<p class="muted center">Hospitals covered: {{ hospitals|map(attribute='name')|join(', ') }}</p>{% endif %}{% endblock %}

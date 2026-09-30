@@ -1,0 +1,15 @@
+{% set ai = ai_of(c) %}
+<aside class="assess" aria-label="AI assessment"><h3>AI assessment</h3>
+{% if not ai %}<p class="muted">Appears after you click Analyze with AI.</p><div class="box">No analysis yet. Enter the symptoms and click Analyze with AI.</div>
+{% else %}<div class="box"><div class="k">Summary</div><p>{{ ai.summary }}</p>
+<div class="k">Suggested department</div><p>{{ ai.department }}</p>
+<div class="k">Urgency</div><p><span class="badge {{ ai.urgency }}">{{ ai.urgency }}</span></p>
+{% if ai.red_flags %}<div class="flash error" style="margin-top:10px">Warning signs: {{ ai.red_flags|join(', ') }}. If this is happening now, go to the nearest emergency department.</div>{% endif %}
+<div class="k">Answer these questions</div>
+<label for="alang" style="font-size:13px">Voice language</label><select id="alang" aria-label="Voice language"><option value="en-IN">English</option><option value="kn-IN">Kannada</option><option value="hi-IN">Hindi</option><option value="ml-IN">Malayalam</option><option value="tcy">Tulu</option></select><p class="muted" id="tulunote" hidden>Tulu is not supported by browser voice typing, so Kannada speech recognition is used. Speak Tulu clearly, or speak in Kannada, and check the text.</p>
+<form method="post" action="{{ url_for('answers', cid=c.id) }}"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="next" value="{{ request.path }}">
+{% set qa = dict(ai.qa or []) %}
+{% for qn in ai.followups %}<label for="a{{ loop.index0 }}">{{ qn }}</label><div class="ans"><input id="a{{ loop.index0 }}" name="a{{ loop.index0 }}" maxlength="300" value="{{ qa.get(qn, '') }}" placeholder="Type or speak the answer"><button type="button" class="gray" data-mic="a{{ loop.index0 }}" aria-label="Speak the answer">&#127908;</button></div>{% endfor %}
+<br><button>Update summary with answers</button></form>
+<div class="k">Source</div><p>{{ 'AI' if ai.source == 'AI' else 'rule-based' }}</p></div>{% endif %}
+<p class="muted">Decision support for clinicians. It is not a diagnosis. In an emergency, go to the nearest emergency department.</p></aside>

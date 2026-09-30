@@ -1,0 +1,13 @@
+{% extends 'base.html' %}{% block body %}{% set step = 2 %}{% include 'steps.html' %}
+<div class="flow"><div>
+<div class="card"><h2>What is the problem?</h2><p class="muted">Describe symptoms in your own words and mention how long they have lasted.</p>
+<form method="post"><input type="hidden" name="csrf" value="{{ csrf }}">
+<label for="complaint">Chief complaint and symptoms</label>
+<textarea id="complaint" name="complaint" rows="4" required placeholder="e.g. Fever for 3 days with body ache and headache">{{ c.complaint }}</textarea>
+<div class="row" style="margin-top:8px"><select id="lang" aria-label="Voice language"><option value="en-IN">English</option><option value="kn-IN">Kannada</option><option value="hi-IN">Hindi</option><option value="ml-IN">Malayalam</option><option value="tcy">Tulu</option></select>
+<button type="button" class="gray" data-mic="complaint">Speak instead of typing</button></div>
+<label>Medical history</label><textarea name="history" rows="2" placeholder="Past illnesses, surgeries">{{ c.history }}</textarea>
+<div class="row"><div><label>Allergies</label><input name="allergies" value="{{ c.allergies }}"></div><div><label>Current medicines</label><input name="meds" value="{{ c.meds }}"></div></div><br>
+<button>Analyze with AI</button> <a class="btn alt" href="{{ url_for('case_new', cid=c.id) }}">&larr; Back</a></form></div>
+{% if ai_of(c) %}<a class="btn" href="{{ url_for('evidence', cid=c.id) }}">Next: add evidence</a>{% endif %}
+</div>{% include 'assess.html' %}</div>{% endblock %}

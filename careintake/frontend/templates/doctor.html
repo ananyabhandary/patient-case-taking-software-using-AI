@@ -1,0 +1,41 @@
+{% extends 'base.html' %}{% block body %}
+<div class="card"><h2>{{ me.name }}</h2><p class="muted">{{ d.dept }}, {{ d.hname }}{% if overview %} &middot; Demo view: totals below cover all doctors{% endif %}</p>
+<div class="grid3"><div><div class="stat">{{ stats.today }}</div>booked today</div><div><div class="stat">{{ stats.upcoming }}</div>upcoming appointments</div><div><div class="stat">{{ stats.total }}</div>total appointments</div></div></div>
+{% if overview %}
+<div class="card"><h3>All bookings (latest first)</h3><p class="muted">Demo view: every appointment booked by patients, with the doctor, day, time and patient details.</p>
+{% if not allb %}<p class="muted">No bookings yet.</p>{% endif %}
+<div class="tablewrap"><table class="bigt"><tr><th>Booked on</th><th>Appointment</th><th>Doctor</th><th>Patient</th><th>Complaint</th><th>Status</th><th></th></tr>
+{% for a in allb %}<tr><td class="muted">{{ a.created }}</td>
+<td><strong>{{ a.day }}</strong><br>{{ t12(a.slot) }}</td>
+<td><strong>{{ a.dname }}</strong><br><span class="muted">{{ a.ddept }}<br>{{ a.hname }}</span></td>
+<td><strong>{{ a.pname }}</strong><br><span class="muted">{{ a.age }} / {{ a.gender }}<br>{{ a.phone }}{% if a.area %}<br>{{ a.area }}{% endif %}</span></td>
+<td>{{ a.complaint or '-' }}<br><span class="badge {{ a.urgency or 'Routine' }}">{{ a.urgency or 'Routine' }}</span></td>
+<td><span class="badge {{ a.status }}">{{ a.status }}</span></td><td><a href="{{ url_for('case_view', cid=a.case_id) }}">Open case</a></td></tr>{% endfor %}</table></div></div>
+<div class="card"><h3>Doctor-wise bookings</h3><p class="muted">Doctors with bookings are shown first.</p>
+<div class="dgrid wide">{% for x in overview %}<div class="dcard {{ '' if x.appts else 'off' }}"><div><strong>{{ x.name }}</strong><br><span class="muted">{{ x.dept }}<br>{{ x.hname }}</span></div>
+<div class="dmeta">{% if x.appts %}<span class="pill ok">{{ x.appts|length }} booked</span>{% else %}<span class="pill no">No bookings</span>{% endif %}</div>
+{% for a in x.appts %}<div class="ovitem"><strong>{{ a.pname }}</strong><br><span class="muted">{{ a.day }} at {{ t12(a.slot) }}</span> <a href="{{ url_for('case_view', cid=a.case_id) }}">Open</a></div>{% endfor %}</div>{% endfor %}</div></div>
+{% endif %}
+<div class="card"><h3>Notifications</h3>{% if not notes %}<p class="muted">No notifications yet. You will be notified here when a patient books or cancels.</p>{% endif %}
+{% for n in notes %}<div class="note {{ n.kind }}"><div>{% if not n.seen %}<span class="badge Soon">New</span> {% endif %}{% if n.kind == 'transfer_in' %}<strong>{{ n.pname }}</strong> was transferred {{ 'to you' if n.dname == me.name else 'to ' ~ n.dname }} from {{ n.other }}
+{% elif n.kind == 'shared' %}<strong>{{ n.other }}</strong> shared patient <strong>{{ n.pname }}</strong>'s details {{ 'with you' if n.dname == me.name else 'with ' ~ n.dname }}
+{% elif n.kind == 'transfer_out' %}<strong>{{ n.pname }}</strong>'s appointment was moved {{ 'away from you' if n.dname == me.name else 'away from ' ~ n.dname }} to {{ n.other }}
+{% else %}<strong>{{ n.pname }}</strong> {{ 'booked' if n.kind == 'booked' else 'cancelled' }} {{ 'an appointment with you' if (not n.dname or n.dname == me.name) else 'an appointment with ' ~ n.dname }}{% endif %}
+<br><span class="muted">{% if n.day %}On <strong>{{ n.day }}</strong> at <strong>{{ t12(n.slot) }}</strong> &middot; {% endif %}received {{ n.created }}</span></div><a href="{{ url_for('case_view', cid=n.case_id) }}">Open case</a></div>{% endfor %}</div>
+<div class="card"><h3>Shared with me by other doctors</h3>{% if not shared %}<p class="muted">No patients have been shared with you yet.</p>{% endif %}
+<div class="tablewrap"><table>{% for s in shared %}<tr><td><strong>{{ s.pname }}</strong> <span class="muted">{{ s.age }}/{{ s.gender }}</span><br><span class="muted">{{ s.complaint }}</span></td>
+<td>From <strong>{{ s.fname }}</strong><br><span class="muted">{{ s.fhname }}<br>{{ s.created }}</span></td><td>{{ s.note or '-' }}</td>
+<td><span class="badge {{ s.urgency or 'Routine' }}">{{ s.urgency or 'Routine' }}</span></td><td><a href="{{ url_for('case_view', cid=s.case_id) }}">Open case</a></td></tr>{% endfor %}</table></div></div>
+<div class="card"><h3>Patients booked with me</h3>{% if not upcoming %}<p class="muted">No upcoming bookings yet. When a patient books you, they appear here with the date and time.</p>{% endif %}
+<div class="tablewrap"><table>{% for a in upcoming %}<tr><td><strong>{{ a.day }}</strong><br>{{ t12(a.slot) }}</td><td>{{ a.pname }} <span class="muted">{{ a.age }}/{{ a.gender }}</span><br><span class="muted">{{ a.complaint }}</span></td>
+<td><span class="badge {{ a.urgency or 'Routine' }}">{{ a.urgency or 'Routine' }}</span></td><td><a href="{{ url_for('case_view', cid=a.case_id) }}">Open case</a><br><a href="{{ url_for('case_view', cid=a.case_id) }}#share">Share with a doctor</a></td></tr>{% endfor %}</table></div></div>
+<div class="card"><h3>Appointments on a date</h3><form method="get" class="row"><input type="date" name="day" value="{{ day }}"><div><button>Show</button></div></form>
+{% if not appts %}<p class="muted">No appointments on {{ day }}.</p>{% endif %}
+<div class="tablewrap"><table>{% for a in appts %}<tr><td>{{ t12(a.slot) }}</td><td>{{ a.pname }} <span class="muted">{{ a.age }}/{{ a.gender }}</span><br><span class="muted">{{ a.complaint }}</span></td>
+<td><span class="badge {{ a.urgency or 'Routine' }}">{{ a.urgency or 'Routine' }}</span> <span class="badge {{ a.status }}">{{ a.status }}</span></td>
+<td><a href="{{ url_for('case_view', cid=a.case_id) }}">Open case</a>{% if a.status == 'booked' %}
+{% for st in ['completed','no_show'] %}<form class="inline" method="post" action="{{ url_for('appt_status', aid=a.id) }}"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="status" value="{{ st }}"><button class="sm gray">{{ 'Done' if st == 'completed' else 'No show' }}</button></form>{% endfor %}{% endif %}</td></tr>{% endfor %}</table></div></div>
+<div class="card"><h3>My availability, next 14 days</h3><div class="tablewrap"><table>{% for w in week %}<tr><td><a href="{{ url_for('doctor_home', day=w.day) }}">{{ w.label }}</a></td><td>{{ w.state }}</td><td>{{ w.n }} booked</td></tr>{% endfor %}</table></div></div>
+<div class="card"><h3>Mark a day unavailable</h3><form method="post" action="{{ url_for('doctor_leave') }}" class="row"><input type="hidden" name="csrf" value="{{ csrf }}">
+<div><label>Date</label><input type="date" name="day" min="{{ today }}" required></div><div><label>Reason (optional)</label><input name="reason" maxlength="80"></div><div><button>Mark unavailable</button></div></form>
+{% for day, reason in leaves %}<p>{{ day }} {{ reason }} <form class="inline" method="post" action="{{ url_for('doctor_leave') }}"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="remove"><input type="hidden" name="day" value="{{ day }}"><button class="sm gray">Remove</button></form></p>{% endfor %}</div>{% endblock %}

@@ -1,0 +1,15 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CareIntake Mangaluru</title><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head><body>
+<div class="bar">In an emergency, go to the nearest hospital emergency department. This tool is not for emergencies.</div>
+<header><a class="brand" href="{{ url_for('home') }}"><span class="logo">+</span>CareIntake Mangaluru</a><nav><a href="{{ url_for('doctors_page') }}">Doctors</a>
+{% if me %}
+  {% if me.role == 'patient' %}<a href="{{ url_for('case_new') }}">New case</a><a href="{{ url_for('dashboard') }}">My appointments</a>
+  {% elif me.role == 'doctor' %}<a href="{{ url_for('doctor_home') }}">Doctor portal{% if notif_n %} <span class="nbadge">{{ notif_n }}</span>{% endif %}</a>
+  {% else %}<a href="{{ url_for('hospital_home') }}">Hospital portal</a>{% endif %}
+  <strong>{{ me.name }}</strong>
+  <form class="inline" method="post" action="{{ url_for('logout') }}"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="link">Log out</button></form>
+{% else %}
+  <a href="{{ url_for('home') }}">Patient sign in</a><a href="{{ url_for('admin_login') }}">Admin login</a>
+{% endif %}</nav></header>
+<main>{% for c, m in get_flashed_messages(with_categories=true) %}<div class="flash {{ c }}">{{ m }}</div>{% endfor %}
+{% block body %}{% endblock %}</main><script src="{{ url_for('static', filename='app.js') }}"></script></body></html>

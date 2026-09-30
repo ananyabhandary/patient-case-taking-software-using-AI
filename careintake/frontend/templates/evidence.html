@@ -1,0 +1,17 @@
+{% extends 'base.html' %}{% block body %}{% set step = 3 %}{% include 'steps.html' %}
+<div class="flow"><div>
+<div class="card"><h2>Evidence for verification</h2>
+<p class="muted">Add proof for your details (ID showing name, age, phone) and your medical history (old prescriptions, reports, discharge summaries). Upload a PDF, PNG or JPG up to 5 MB, or type the details. Hospital staff mark each item verified or rejected.</p>
+<div class="row">
+<form method="post" enctype="multipart/form-data"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="upload"><h3>Upload a file</h3>
+<label>What is it?</label><select name="kind"><option value="identity">Patient details proof (ID)</option><option value="history">Medical history record</option></select>
+<label>File</label><input type="file" name="file" accept=".pdf,.png,.jpg,.jpeg" required><label>Note (optional)</label><input name="note" maxlength="200"><br><br><button>Upload file</button></form>
+<form method="post"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="manual"><h3>Enter manually</h3>
+<label>What is it?</label><select name="kind"><option value="history">Medical history</option><option value="identity">Patient details</option></select>
+<label>Details</label><textarea name="note" rows="3" required placeholder="e.g. Diabetic since 2015, on metformin 500 mg"></textarea><br><button>Add entry</button></form></div></div>
+<div class="card"><h3>Added so far</h3>{% if not items %}<p class="muted">Nothing added yet. You can also skip this step.</p>{% endif %}
+<div class="tablewrap"><table>{% for e in items %}<tr><td>{{ 'Details proof' if e.kind == 'identity' else 'History' }}</td>
+<td>{% if e.fname %}<a href="{{ url_for('evidence_file', eid=e.id) }}" target="_blank">{{ e.orig }}</a>{% endif %} {{ e.note }}</td>
+<td><span class="badge {{ e.status }}">{{ e.status }}</span> <span class="badge manual">{{ e.method }}</span></td>
+<td>{% if e.status == 'pending' %}<form method="post" class="inline"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="{{ e.id }}"><button class="sm red">Remove</button></form>{% endif %}</td></tr>{% endfor %}</table></div><br>
+<a class="btn alt" href="{{ url_for('symptoms', cid=c.id) }}">&larr; Back</a> <a class="btn" href="{{ url_for('book', cid=c.id) }}">Next: choose doctor</a></div></div>{% include 'assess.html' %}</div>{% endblock %}

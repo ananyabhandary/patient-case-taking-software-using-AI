@@ -1,0 +1,18 @@
+{% extends 'base.html' %}{% block body %}
+<div class="card"><h2>Case #{{ c.id }}: {{ c.name }}</h2>
+<div class="row"><div><strong>Age / gender:</strong> {{ c.age }} / {{ c.gender }}<br><strong>Phone:</strong> {{ c.phone }}<br><strong>Area:</strong> {{ c.area or '-' }}</div>
+<div><strong>Department:</strong> {{ c.dept or '-' }} {% if c.urgency %}<span class="badge {{ c.urgency }}">{{ c.urgency }}</span>{% endif %}</div></div>
+<p><strong>Complaint:</strong> {{ c.complaint }}</p><p><strong>History:</strong> {{ c.history or '-' }}<br><strong>Allergies:</strong> {{ c.allergies or '-' }}<br><strong>Medicines:</strong> {{ c.meds or '-' }}</p>
+{% if ai %}<div class="flash"><strong>AI summary:</strong> {{ ai.summary }}{% if ai.red_flags %}<br>Warning signs: {{ ai.red_flags|join(', ') }}{% endif %}<br><span class="muted">Decision support only, not a diagnosis.</span></div>{% endif %}
+{% for a in appts %}<p><strong>Appointment:</strong> {{ a.day }} {{ a.slot }} with {{ a.dname }} <span class="badge {{ a.status }}">{{ a.status }}</span></p>{% endfor %}</div>
+{% if me.role != 'patient' %}<div class="card" id="share"><h3>Share patient details with another doctor</h3>
+{% if me.role == 'doctor' %}<p class="muted">The doctor you choose can open this case (summary, history, allergies, evidence) and will get a notification. Use this for a second opinion or when you are unavailable.</p>
+<form method="post" action="{{ url_for('case_share', cid=c.id) }}"><input type="hidden" name="csrf" value="{{ csrf }}">
+<div class="row"><div><label for="sd">Doctor</label><select id="sd" name="doctor_id" required>{% for hn, grp in share_docs|groupby('hname') %}<optgroup label="{{ hn }}">{% for d in grp %}<option value="{{ d.id }}">{{ d.name }} ({{ d.dept }})</option>{% endfor %}</optgroup>{% endfor %}</select></div>
+<div><label for="sn">Note for the doctor (optional)</label><input id="sn" name="note" maxlength="500" placeholder="e.g. Please review, I am on leave"></div></div><br><button>Share details</button></form>{% endif %}
+{% if shares %}<h4>Shared so far</h4><div class="tablewrap"><table>{% for s in shares %}<tr><td><strong>{{ s.tname }}</strong><br><span class="muted">{{ s.thname }}</span></td><td>Shared by {{ s.fname }}<br><span class="muted">{{ s.created }}</span></td><td>{{ s.note or '-' }}</td></tr>{% endfor %}</table></div>{% elif me.role != 'doctor' %}<p class="muted">Not shared with any other doctor.</p>{% endif %}</div>
+{% endif %}<div class="card"><h3>Evidence and history verification</h3>{% if not items %}<p class="muted">No evidence added.</p>{% endif %}
+<div class="tablewrap"><table>{% for e in items %}<tr><td>{{ 'Details proof' if e.kind == 'identity' else 'History' }}</td>
+<td>{% if e.fname %}<a href="{{ url_for('evidence_file', eid=e.id) }}" target="_blank">{{ e.orig }}</a>{% endif %} {{ e.note }}</td>
+<td><span class="badge {{ e.status }}">{{ e.status }}</span> <span class="badge manual">{{ e.method }}</span></td>
+<td>{% if me.role != 'patient' %}{% for st in ['verified','rejected'] %}<form class="inline" method="post" action="{{ url_for('evidence_verify', eid=e.id) }}"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="status" value="{{ st }}"><button class="sm {{ 'gray' if st == 'verified' else 'red' }}">{{ st|capitalize }}</button></form> {% endfor %}{% endif %}</td></tr>{% endfor %}</table></div></div>{% endblock %}

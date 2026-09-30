@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% macro dcard(d, showh) %}{% set tot = nslots %}{% set fr = (d.slots|length) if d.slots else 0 %}{% set bk = (tot - fr) if d.slots is not none else 0 %}
+<div class="dcard {{ 'off' if not d.slots }}"><div class="dhead"><span class="av"><svg viewBox="0 0 48 48" width="52" height="52" aria-hidden="true"><circle cx="24" cy="24" r="24" fill="#dff0f4"/><circle cx="24" cy="19" r="8" fill="#eab98f"/><path d="M16 15c0-9 16-9 16 0-4-4-12-4-16 0z" fill="#3a2a25"/><path d="M8 44c0-10 8-14 16-14s16 4 16 14" fill="none" stroke="#0f7a8a" stroke-width="2.5"/></svg></span>
+<div><strong>{{ d.name }}</strong><div class="muted">{{ d.dept }}</div></div></div>
+<span class="chip">{{ d.dept }}</span>
+<div class="muted">{{ d.hname }}</div>
+<progress class="bar2" max="{{ tot }}" value="{{ bk }}"></progress>
+<div class="dmeta">{% if d.slots is none %}<span class="pill no">Not available</span>{% elif not d.slots %}<span class="pill no">Fully booked</span>{% else %}<span class="pill ok">{{ fr }} slots free</span>{% endif %}<span class="muted">{{ bk }}/{{ tot }} booked</span></div>
+{% if d.slots %}<form method="post" class="slots"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="doctor_id" value="{{ d.id }}"><input type="hidden" name="day" value="{{ day }}">
+{% for s in d.slots %}<button name="slot" value="{{ s }}">{{ s }}</button>{% endfor %}</form>{% endif %}</div>{% endmacro %}
+{% block body %}{% set step = 4 %}{% include 'steps.html' %}
+<div class="flow"><div>
+<div class="card"><h2>Choose hospital and doctor</h2><p class="muted">Department is filled from the AI result. You can change it. Slots are 30 minutes, 9:00 AM to 5:00 PM, closed 1 to 2 PM and on Sundays.</p>
+<form method="get"><div class="row"><div><label>Hospital</label><select name="hospital">{% for h in hs %}<option value="{{ h.id }}" {{ 'selected' if h.id == hid }}>{{ h.name }} ({{ h.area }})</option>{% endfor %}</select></div>
+<div><label>Department</label><select name="dept">{% for x in depts %}<option {{ 'selected' if x == dept }}>{{ x }}</option>{% endfor %}</select></div>
+<div><label>Appointment date</label><input type="date" name="day" min="{{ today }}" value="{{ day }}" required></div></div><br><button>Show available doctors</button></form></div>
+{% if day %}
+  {% set alld = docs + others %}
+  <div class="card"><h3 style="margin-top:0">Doctors on {{ day }}</h3>
+  <div class="stats"><div class="mini"><b>{{ alld|length }}</b>doctors</div><div class="mini"><b>{{ alld|map(attribute='slots')|select|map('length')|sum }}</b>free slots</div></div>
+  <label class="chk"><input type="checkbox" id="onlyfree" checked> Only available doctors</label></div>
+  {% if docs %}<div class="dgrid">{% for d in docs %}{{ dcard(d, false) }}{% endfor %}</div>
+  {% else %}<div class="flash">No {{ dept }} doctors are listed at this hospital.</div>{% endif %}
+  {% if others %}<h3>Other doctors available on {{ day }}</h3><div class="dgrid">{% for d in others %}{{ dcard(d, true) }}{% endfor %}</div>{% endif %}
+  {% if nxt and not others %}<div class="flash">No {{ dept }} doctor is free on {{ day }}. The next available date at this hospital is
+  <a href="{{ url_for('book', cid=c.id, hospital=hid, dept=dept, day=nxt) }}">{{ nxt }}</a>.</div>{% endif %}
+{% endif %}
+<p><a class="btn alt" href="{{ url_for('evidence', cid=c.id) }}">&larr; Back</a></p>
+</div>{% include 'assess.html' %}</div>{% endblock %}

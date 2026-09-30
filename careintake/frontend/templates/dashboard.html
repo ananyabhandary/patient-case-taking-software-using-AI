@@ -1,0 +1,7 @@
+{% extends 'base.html' %}{% block body %}
+<div class="card"><h2>My appointments</h2>{% if not appts %}<p class="muted">No appointments yet. <a href="{{ url_for('case_new') }}">Start a new case</a>.</p>{% endif %}
+<div class="tablewrap"><table>{% for a in appts %}<tr><td>{{ a.day }}<br>{{ a.slot }}</td><td>{{ a.pname }}<br><span class="muted">{{ a.complaint }}</span></td><td>{{ a.dname }}<br><span class="muted">{{ a.hname }}</span></td>
+<td><span class="badge {{ a.status }}">{{ a.status }}</span></td><td><a href="{{ url_for('case_view', cid=a.case_id) }}">Case</a>
+{% if a.status == 'booked' %}<form class="inline" method="post" action="{{ url_for('cancel', aid=a.id) }}"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="sm red">Cancel</button></form>{% endif %}</td></tr>{% endfor %}</table></div></div>
+<div class="card"><h2>My cases</h2><div class="tablewrap"><table>{% for c in cases %}<tr><td>{{ c.name }}</td><td>{{ c.complaint or 'Not described yet' }}</td><td>{{ c.dept or '-' }}</td>
+<td><a href="{{ url_for('case_view', cid=c.id) }}">Open</a> | <a href="{{ url_for('evidence', cid=c.id) }}">Evidence</a> | <a href="{{ url_for('book', cid=c.id) }}">Book</a></td></tr>{% endfor %}</table></div></div>{% endblock %}

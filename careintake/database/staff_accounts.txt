@@ -1,0 +1,30 @@
+CareIntake Mangaluru - staff accounts (emails only, no passwords).
+Each person sets their own password: Sign in > choose portal > Set or reset password. A code is sent to that email.
+
+HOSPITAL  KMC Hospital, Attavar: admin1@careintake.local
+  DOCTOR  Dr. B. Rao (General Medicine): brao1@careintake.local
+  DOCTOR  Dr. S. Nayak (General Medicine): snayak1@careintake.local
+  DOCTOR  Dr. R. Pai (Gastroenterology): rpai1@careintake.local
+  DOCTOR  Dr. A. Kini (Gastroenterology): akini1@careintake.local
+  DOCTOR  Dr. M. Hegde (Cardiology): mhegde1@careintake.local
+HOSPITAL  Father Muller Medical College Hospital: admin2@careintake.local
+  DOCTOR  Dr. J. D'Souza (General Medicine): jdsouza2@careintake.local
+  DOCTOR  Dr. L. Pinto (General Medicine): lpinto2@careintake.local
+  DOCTOR  Dr. C. Rodrigues (Orthopaedics): crodrigues2@careintake.local
+  DOCTOR  Dr. V. Shenoy (Paediatrics): vshenoy2@careintake.local
+HOSPITAL  A.J. Hospital & Research Centre: admin3@careintake.local
+  DOCTOR  Dr. D. Kamath (General Medicine): dkamath3@careintake.local
+  DOCTOR  Dr. K. Prabhu (General Medicine): kprabhu3@careintake.local
+  DOCTOR  Dr. A. Shetty (Gastroenterology): ashetty3@careintake.local
+  DOCTOR  Dr. G. Bhandary (Gastroenterology): gbhandary3@careintake.local
+  DOCTOR  Dr. N. Bhat (Neurology): nbhat3@careintake.local
+HOSPITAL  Yenepoya Medical College Hospital: admin4@careintake.local
+  DOCTOR  Dr. F. Khan (General Medicine): fkhan4@careintake.local
+  DOCTOR  Dr. H. Ali (General Medicine): hali4@careintake.local
+  DOCTOR  Dr. T. George (ENT): tgeorge4@careintake.local
+  DOCTOR  Dr. P. Menon (Dermatology): pmenon4@careintake.local
+HOSPITAL  Government Wenlock District Hospital: admin5@careintake.local
+  DOCTOR  Dr. G. Acharya (General Medicine): gacharya5@careintake.local
+  DOCTOR  Dr. S. Kumar (General Medicine): skumar5@careintake.local
+  DOCTOR  Dr. U. Rai (Gynaecology): urai5@careintake.local
+  DOCTOR  Dr. Y. Poojary (Cardiology): ypoojary5@careintake.local

@@ -1,0 +1,8 @@
+{% extends 'base.html' %}{% block body %}{% set step = 1 %}{% include 'steps.html' %}
+<div class="card"><h2>Patient details</h2><p class="muted">Basic information for the hospital record.</p>
+<form method="post"><input type="hidden" name="csrf" value="{{ csrf }}">
+<div class="row"><div><label>Full name</label><input name="name" required value="{{ ec.name if ec else me.name }}"></div>
+<div><label>Age</label><input name="age" type="number" min="0" max="120" required value="{{ ec.age if ec else '' }}"></div>
+<div><label>Gender</label><select name="gender">{% for g in ['Male','Female','Other'] %}<option {{ 'selected' if ec and ec.gender == g }}>{{ g }}</option>{% endfor %}</select></div>
+<div><label>Phone</label><input name="phone" pattern="[0-9]{10}" required value="{{ ec.phone if ec else me.phone }}"></div></div>
+<label>Area in Mangaluru</label><input name="area" placeholder="e.g. Kadri, Bejai, Kankanady" value="{{ ec.area if ec else '' }}"><br><br><button>Next: symptoms</button></form></div>{% endblock %}

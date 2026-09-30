@@ -1,0 +1,21 @@
+{% extends 'base.html' %}{% block body %}
+<div class="intro"><h1>Doctors in Mangaluru hospitals</h1><p class="muted">Availability updates as patients book and cancel. Timings: 9:00 AM to 5:00 PM, closed 1 to 2 PM and on Sundays. Sample doctors for the prototype.</p></div>
+<div class="stats"><div class="mini"><b>{{ nhosp }}</b>hospitals</div><div class="mini"><b>{{ ndocs }}</b>doctors</div><div class="mini"><b>{{ total_free }}</b>free slots</div></div>
+<form method="get" class="card dfilter"><input type="hidden" name="go" value="1">
+<div><label>Hospital</label><select name="hospital"><option value="">All hospitals</option>{% for h in hs %}<option value="{{ h.id }}" {{ 'selected' if h.id == hid }}>{{ h.name }}</option>{% endfor %}</select></div>
+<div><label>Department</label><select name="dept"><option value="">All departments</option>{% for x in depts %}<option {{ 'selected' if x == dept }}>{{ x }}</option>{% endfor %}</select></div>
+<div><label>Date</label><input type="date" name="day" min="{{ today }}" value="{{ day }}"></div>
+<label class="chk"><input type="checkbox" name="only" value="1" {{ 'checked' if only }}> Only available doctors</label>
+<button>Show</button></form>
+{% if not docs %}<div class="flash">No doctors match. Try another date or untick "Only available doctors".</div>{% endif %}
+<div class="dgrid wide">{% for d in docs %}{% set fr = d.slots|length if d.slots else 0 %}{% set bk = nslots - fr if d.slots is not none else 0 %}
+<div class="dcard {{ 'off' if d.status != 'free' }}"><div class="dhead"><span class="av"><svg viewBox="0 0 48 48" width="52" height="52" aria-hidden="true"><circle cx="24" cy="24" r="24" fill="#dff0f4"/><circle cx="24" cy="19" r="8" fill="#eab98f"/><path d="M16 15c0-9 16-9 16 0-4-4-12-4-16 0z" fill="#3a2a25"/><path d="M8 44c0-10 8-14 16-14s16 4 16 14" fill="none" stroke="#0f7a8a" stroke-width="2.5"/></svg></span>
+<div><strong>{{ d.name }}</strong><div class="muted">{{ d.dept }}</div></div></div>
+<span class="chip">{{ d.dept }}</span><div class="muted">{{ d.hname }}, {{ d.area }}</div>
+<progress class="bar2" max="{{ nslots }}" value="{{ bk }}"></progress>
+<div class="dmeta">{% if d.status == 'free' %}<span class="pill ok">{{ fr }} slots free</span>{% elif d.status == 'full' %}<span class="pill no">Fully booked</span>{% elif d.status == 'leave' %}<span class="pill no">On leave</span>{% else %}<span class="pill no">Closed</span>{% endif %}<span class="muted">{{ bk }}/{{ nslots }} booked</span></div>
+<div class="k2">Timings</div><div class="muted">Mon to Sat, 9:00 AM to 5:00 PM (lunch 1 to 2 PM)</div>
+{% if d.slots %}<div class="k2">Free on {{ day }}</div><div class="tchips">{% for s in d.slots %}<span>{{ t12(s) }}</span>{% endfor %}</div>{% endif %}
+</div>{% endfor %}</div>
+{% if me and me.role == 'patient' %}<p><a class="btn" href="{{ url_for('case_new') }}">Start a new case to book</a></p>{% elif not me %}<p><a class="btn" href="{{ url_for('home') }}">Sign in to book</a></p>{% endif %}
+{% endblock %}

@@ -1,0 +1,12 @@
+create table if not exists hospitals(id integer primary key,name text,area text);
+create table if not exists users(id integer primary key,role text,name text,email text,phone text,pw text,hospital_id integer,verified integer default 0,fails integer default 0,locked real default 0,unique(email,role));
+create table if not exists doctors(id integer primary key,user_id integer,hospital_id integer,dept text,active integer default 1);
+create table if not exists leaves(id integer primary key,doctor_id integer,day text,reason text,unique(doctor_id,day));
+create table if not exists cases(id integer primary key,patient_id integer,name text,age integer,gender text,phone text,area text,complaint text,history text,allergies text,meds text,ai text,dept text,urgency text,created text default current_timestamp);
+create table if not exists evidence(id integer primary key,case_id integer,kind text,method text,fname text,orig text,note text,status text default 'pending',checked_by integer,created text default current_timestamp);
+create table if not exists appts(id integer primary key,case_id integer,patient_id integer,doctor_id integer,day text,slot text,status text default 'booked',created text default current_timestamp);
+create unique index if not exists one_slot on appts(doctor_id,day,slot) where status='booked';
+create table if not exists otps(user_id integer primary key,h text,exp real,tries integer default 0);
+create table if not exists audit(id integer primary key,ts text default current_timestamp,uid integer,action text,detail text);
+create table if not exists notifications(id integer primary key,user_id integer,kind text,pname text,day text,slot text,case_id integer,seen integer default 0,created text default current_timestamp);
+create table if not exists case_shares(id integer primary key,case_id integer,from_doc integer,to_doc integer,note text,created text default current_timestamp,unique(case_id,to_doc));
